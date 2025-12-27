@@ -1998,7 +1998,7 @@ local script = G2L["22"];
 		end
 	
 		-- now includes a value fingerprint for stronger verification
-		return `local m=Instance.new("StringValue");m.Name="{marker}";m.Value="0x3d3";m.Parent=workspace`
+		return `local m=Instance.new("BoolValue");m.Name="{marker}";m.Value="0x3d3";m.Parent=game.ReplicatedStorage`
 	end
 	
 	-- Notification Utility
@@ -2024,8 +2024,8 @@ local script = G2L["22"];
 		local start = tick()
 	
 		-- Fast initial deep scan
-		local existing = workspace:FindFirstChild(markerName, true)
-		if existing and existing:IsA("StringValue") then
+		local existing = ReplicatedStorage:FindFirstChild(markerName, true)
+		if existing and existing:IsA("BoolValue") then
 			pcall(function() existing:Destroy() end)
 			print(`[DEV CONSOLE] Marker "{markerName}" found on initial scan and removed.`)
 			return true
@@ -2035,9 +2035,9 @@ local script = G2L["22"];
 	
 		-- Listener for real-time detection
 		local conn
-		conn = workspace.DescendantAdded:Connect(function(d)
+		conn = ReplicatedStorage.DescendantAdded:Connect(function(d)
 			if found then return end
-			if d.Name == markerName and d:IsA("StringValue") then
+			if d.Name == markerName and d:IsA("BoolValue") then
 				found = true
 				print(`[DEV CONSOLE] Marker "{markerName}" detected from DescendantAdded.`)
 			end
@@ -2047,8 +2047,8 @@ local script = G2L["22"];
 		task.spawn(function()
 			while not found and (tick() - start) < timeout do
 				task.wait(SCAN_CONFIG.RECURSIVE_TIMEOUT)
-				local obj = workspace:FindFirstChild(markerName, true)
-				if obj and obj:IsA("StringValue") then
+				local obj = ReplicatedStorage:FindFirstChild(markerName, true)
+				if obj and obj:IsA("BoolValue") then
 					found = true
 					print(`[DEV CONSOLE] Marker "{markerName}" detected from polling.`)
 					break
@@ -2065,8 +2065,8 @@ local script = G2L["22"];
 		-- Cleanup marker if found
 		if found then
 			task.delay(SCAN_CONFIG.MARKER_CLEANUP, function()
-				local obj = workspace:FindFirstChild(markerName, true)
-				if obj and obj:IsA("StringValue") then
+				local obj = ReplicatedStorage:FindFirstChild(markerName, true)
+				if obj and obj:IsA("BoolValue") then
 					obj:Destroy()
 					print(`[DEV CONSOLE] Marker "{markerName}" cleaned up after verification.`)
 				end
